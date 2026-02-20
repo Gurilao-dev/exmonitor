@@ -32,7 +32,7 @@ class WebRTCService {
         return new Promise((resolve, reject) => {
             this.deviceId = deviceId;
             const wsEndpoint = `${WS_URL}/ws/signaling`.replace(/\/+/g, '/').replace('ws:/', 'ws://').replace('wss:/', 'wss://');
-            
+
             try {
                 this.socket = new WebSocket(wsEndpoint);
             } catch (err) {
@@ -79,6 +79,11 @@ class WebRTCService {
             case 'ice-candidate':
                 await this.handleIceCandidate(data);
                 break;
+            case 'request-offer':
+                if (this.localStream) {
+                    await this.createOffer();
+                }
+                break;
             case 'stream-stopped':
             case 'peer-disconnected':
                 if (this.onDisconnectCallback) this.onDisconnectCallback();
@@ -90,12 +95,18 @@ class WebRTCService {
         }
     }
 
+    requestOffer() {
+        if (this.socket && this.socket.readyState === 1) {
+            this.socket.send(JSON.stringify({ type: 'request-offer' }));
+        }
+    }
+
     async startLocalStream(customConstraints = null) {
         if (!window.isSecureContext) throw new Error('HTTPS required for camera');
-        
-        const constraints = customConstraints || { 
-            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, 
-            audio: { echoCancellation: true, noiseSuppression: true } 
+
+        const constraints = customConstraints || {
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: { echoCancellation: true, noiseSuppression: true }
         };
 
         try {
@@ -113,7 +124,7 @@ class WebRTCService {
 
     createPeerConnection() {
         if (this.peerConnection) this.peerConnection.close();
-        
+
         this.peerConnection = new RTCPeerConnection(this.config);
 
         if (this.localStream) {

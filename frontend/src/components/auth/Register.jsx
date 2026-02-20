@@ -52,70 +52,72 @@ function Register({ onSuccess }) {
             <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '440px', padding: '0 24px' }}
                 className="sm:glass-panel sm:animate-scale-in">
 
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: '64px', height: '64px', borderRadius: '16px', marginBottom: '20px',
-                        background: 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(99,102,241,0.15))',
-                        border: '1px solid rgba(6,182,212,0.2)',
-                    }}>
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                            <circle cx="8.5" cy="7" r="4" />
-                            <line x1="20" y1="8" x2="20" y2="14" />
-                            <line x1="23" y1="11" x2="17" y2="11" />
-                        </svg>
-                    </div>
-                    <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>Create Account</h2>
-                    <p style={{ color: '#6b7280', marginTop: '6px', fontSize: '14px' }}>Step {step} of 2 — {step === 1 ? 'Verify your email' : 'Set a password'}</p>
+                <div className="py-8 px-4 sm:px-2">
+                    <div style={{ textAlign: 'center', marginBottom: '2.rem' }}>
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            width: '64px', height: '64px', borderRadius: '16px', marginBottom: '20px',
+                            background: 'linear-gradient(135deg, rgba(6,182,212,0.2), rgba(99,102,241,0.15))',
+                            border: '1px solid rgba(6,182,212,0.2)',
+                        }}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <line x1="20" y1="8" x2="20" y2="14" />
+                                <line x1="23" y1="11" x2="17" y2="11" />
+                            </svg>
+                        </div>
+                        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>Create Account</h2>
+                        <p style={{ color: '#6b7280', marginTop: '6px', fontSize: '14px' }}>Step {step} of 2 — {step === 1 ? 'Verify your email' : 'Set a password'}</p>
 
-                    {/* Step bar */}
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
-                        <div style={{ width: '32px', height: '3px', borderRadius: '99px', background: step >= 1 ? '#6366f1' : '#374151', transition: 'background 0.3s' }} />
-                        <div style={{ width: '32px', height: '3px', borderRadius: '99px', background: step >= 2 ? '#6366f1' : '#374151', transition: 'background 0.3s' }} />
+                        {/* Step bar */}
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
+                            <div style={{ width: '32px', height: '3px', borderRadius: '99px', background: step >= 1 ? '#6366f1' : '#374151', transition: 'background 0.3s' }} />
+                            <div style={{ width: '32px', height: '3px', borderRadius: '99px', background: step >= 2 ? '#6366f1' : '#374151', transition: 'background 0.3s' }} />
+                        </div>
                     </div>
-                </div>
 
-                {step === 1 ? (
-                    <form onSubmit={handleStep1} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
-                        <div>
-                            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Email</label>
-                            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input-field" placeholder="your@email.com" required />
-                        </div>
-                        {error && <ErrorMsg msg={error} />}
-                        <button type="submit" disabled={loading} className="btn-primary w-full" style={{ marginTop: '8px' }}>
-                            {loading ? <Spinner label="Processing..." /> : 'Continue'}
-                        </button>
-                    </form>
-                ) : (
-                    <form onSubmit={handleStep2} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
-                        <div>
-                            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Email</label>
-                            <input type="email" value={email} className="input-field" style={{ opacity: 0.5 }} disabled />
-                        </div>
-                        <div>
-                            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Password</label>
-                            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="input-field" placeholder="Minimum 8 characters" required minLength={8} />
-                        </div>
-                        <div>
-                            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Confirm Password</label>
-                            <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="input-field" placeholder="Repeat your password" required />
-                        </div>
-                        {error && <ErrorMsg msg={error} />}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
-                            <button type="submit" disabled={loading} className="btn-primary w-full">
-                                {loading ? <Spinner label="Creating Account..." /> : 'Complete Registration'}
+                    {step === 1 ? (
+                        <form onSubmit={handleStep1} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
+                            <div>
+                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Email</label>
+                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input-field" placeholder="your@email.com" required />
+                            </div>
+                            {error && <ErrorMsg msg={error} />}
+                            <button type="submit" disabled={loading} className="btn-primary w-full" style={{ marginTop: '8px' }}>
+                                {loading ? <Spinner label="Processing..." /> : 'Continue'}
                             </button>
-                            <button type="button" onClick={() => { setStep(1); setError(''); }} className="btn-secondary w-full text-sm">Back</button>
-                        </div>
-                    </form>
-                )}
+                        </form>
+                    ) : (
+                        <form onSubmit={handleStep2} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="animate-fade-in">
+                            <div>
+                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Email</label>
+                                <input type="email" value={email} className="input-field" style={{ opacity: 0.5 }} disabled />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Password</label>
+                                <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="input-field" placeholder="Minimum 8 characters" required minLength={8} />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Confirm Password</label>
+                                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="input-field" placeholder="Repeat your password" required />
+                            </div>
+                            {error && <ErrorMsg msg={error} />}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
+                                <button type="submit" disabled={loading} className="btn-primary w-full">
+                                    {loading ? <Spinner label="Creating Account..." /> : 'Complete Registration'}
+                                </button>
+                                <button type="button" onClick={() => { setStep(1); setError(''); }} className="btn-secondary w-full text-sm">Back</button>
+                            </div>
+                        </form>
+                    )}
 
-                <div style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
-                    <p style={{ color: '#6b7280', fontSize: '14px' }}>
-                        Already have an account?{' '}
-                        <Link to="/login" style={{ color: '#818cf8', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
-                    </p>
+                    <div style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
+                        <p style={{ color: '#6b7280', fontSize: '14px' }}>
+                            Already have an account?{' '}
+                            <Link to="/login" style={{ color: '#818cf8', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

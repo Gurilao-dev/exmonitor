@@ -68,6 +68,10 @@ class APIService {
         return data;
     }
 
+    async verifyGlobalPassword() {
+        return this.client.get('/auth/verify-global');
+    }
+
     async requestRegister(email) {
         const data = await this.client.post('/auth/request-register', { email });
         localStorage.setItem('registerToken', data.registerToken);
@@ -87,7 +91,7 @@ class APIService {
     }
 
     async logout() {
-        try { await this.client.post('/auth/logout'); } catch (e) {}
+        try { await this.client.post('/auth/logout'); } catch (e) { }
         this.clearTokens();
     }
 

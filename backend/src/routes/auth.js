@@ -30,6 +30,15 @@ export default async function authRoutes(fastify) {
       };
     });
 
+  fastify.get('/verify-global',
+    {
+      preHandler: [verifyPreLoginToken]
+    },
+    async (request, reply) => {
+      return { ok: true };
+    }
+  );
+
   // === Registration Flow ===
 
   fastify.post('/request-register',

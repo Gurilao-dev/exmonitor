@@ -46,6 +46,7 @@ export default async function signalingHandler(fastify) {
                     case 'offer':
                     case 'answer':
                     case 'ice-candidate':
+                    case 'request-offer':
                         relayToPeers(deviceId, userId, data);
                         break;
                     case 'stop-stream':

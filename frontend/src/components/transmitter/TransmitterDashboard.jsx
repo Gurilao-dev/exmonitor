@@ -84,7 +84,6 @@ function TransmitterDashboard({ onLogout }) {
             if (!tokenData?.streamToken) throw new Error('Failed to obtain stream token from server.');
 
             await webrtcRef.current.connect(tokenData.streamToken, device.deviceId);
-            await webrtcRef.current.createOffer();
 
             // Mark device as streaming
             await api.updateDeviceStatus(device.deviceId, 'streaming');

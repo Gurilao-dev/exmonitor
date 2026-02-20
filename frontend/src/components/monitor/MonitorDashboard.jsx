@@ -51,6 +51,7 @@ function MonitorDashboard({ onLogout }) {
 
             const tokenData = await api.getStreamToken(device.deviceId);
             await webrtcRef.current.connect(tokenData.streamToken, device.deviceId);
+            webrtcRef.current.requestOffer();
 
             // Set session info and navigate to full-screen stream page
             setSessionInfo({
@@ -130,7 +131,7 @@ function MonitorDashboard({ onLogout }) {
                 {/* Pair Device Form */}
                 {showPairForm && (
                     <div className="card mb-6 animate-slide-down">
-                        <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-white mb-4 flex items-center justify-center sm:justify-start gap-2">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-accent-400" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
                                 <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
@@ -149,10 +150,10 @@ function MonitorDashboard({ onLogout }) {
                                 required
                             />
                             <div className="flex gap-2">
-                                <button type="submit" disabled={loading} className="btn-primary text-sm px-5 py-2.5 flex-1 sm:flex-none">
+                                <button type="submit" disabled={loading} className="btn-primary text-sm px-5 py-2.5 flex-1 sm:flex-none flex items-center justify-center">
                                     {loading ? 'Pairing...' : 'Pair'}
                                 </button>
-                                <button type="button" onClick={() => setShowPairForm(false)} className="btn-secondary text-sm px-4 py-2.5 flex-1 sm:flex-none">
+                                <button type="button" onClick={() => setShowPairForm(false)} className="btn-secondary text-sm px-4 py-2.5 flex-1 sm:flex-none flex items-center justify-center">
                                     Cancel
                                 </button>
                             </div>
@@ -163,44 +164,69 @@ function MonitorDashboard({ onLogout }) {
                 {/* Devices List */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {devices.map((device) => (
-                        <div key={device.deviceId} className="card animate-fade-in">
-                            <div className="flex justify-between items-start mb-4">
+                        <div key={device.deviceId} className="card animate-fade-in relative group">
+                            {/* Device Delete Button */}
+                            <button
+                                onClick={async (e) => {
+                                    e.stopPropagation();
+                                    if (window.confirm('Delete this device?')) {
+                                        try {
+                                            await api.deleteDevice(device.deviceId);
+                                            loadDevices();
+                                        } catch (err) {
+                                            alert(err.error || 'Failed to delete device');
+                                        }
+                                    }
+                                }}
+                                className="absolute top-3 right-3 p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500/70 hover:text-red-500 rounded-lg transition-colors border border-red-500/20 opacity-0 group-hover:opacity-100 flex items-center justify-center"
+                                title="Delete device"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+
+                            <div className="flex justify-between items-start mb-4 pr-8">
                                 <div className="min-w-0 pr-3">
                                     <h4 className="font-bold text-white text-sm truncate">{device.deviceName}</h4>
                                     <p className="text-xs text-gray-600 mt-1 capitalize">{device.status}</p>
                                 </div>
-                                <span className={`badge text - [10px] shrink - 0 ${device.status === 'streaming' ? 'badge-online' : 'badge-offline'} `}>
+                                <span className={`badge text-[10px] shrink-0 ${device.status === 'streaming' ? 'badge-online' : 'badge-offline'} `}>
                                     <span className={`${device.status === 'streaming' ? 'status-dot-online' : 'status-dot-offline'} `} style={{ width: '5px', height: '5px' }} />
                                     {device.status === 'streaming' ? 'Online' : 'Offline'}
                                 </span>
                             </div>
-                            <button
-                                onClick={() => watchStream(device)}
-                                disabled={loading || device.status !== 'streaming'}
-                                className={`w - full text - xs py - 2.5 rounded - xl font - semibold transition - all duration - 200 flex items - center justify - center gap - 2 ${device.status === 'streaming' ? 'btn-primary' : 'text-gray-600 cursor-not-allowed'
-                                    } `}
-                                style={device.status !== 'streaming' ? {
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.05)',
-                                } : {}}
-                            >
-                                {device.status === 'streaming' ? (
-                                    <>
-                                        {loading ? (
-                                            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                            </svg>
-                                        ) : (
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                                <circle cx="12" cy="12" r="3" />
-                                            </svg>
-                                        )}
-                                        {loading ? 'Connecting...' : 'Watch Stream'}
-                                    </>
-                                ) : 'Offline'}
-                            </button>
+
+                            <div className="flex flex-col gap-2">
+                                <button
+                                    onClick={() => watchStream(device)}
+                                    disabled={loading || device.status !== 'streaming'}
+                                    className={`w-full text-xs py-2.5 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${device.status === 'streaming' ? 'btn-primary' : 'text-gray-600 cursor-not-allowed'
+                                        }`}
+                                    style={device.status !== 'streaming' ? {
+                                        background: 'rgba(255,255,255,0.03)',
+                                        border: '1px solid rgba(255,255,255,0.05)',
+                                    } : {}}
+                                >
+                                    {device.status === 'streaming' ? (
+                                        <>
+                                            {loading ? (
+                                                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                                </svg>
+                                            ) : (
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '-1px' }}>
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                    <circle cx="12" cy="12" r="3" />
+                                                </svg>
+                                            )}
+                                            {loading ? 'Connecting...' : 'Watch Stream'}
+                                        </>
+                                    ) : 'Offline'}
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
